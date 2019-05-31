@@ -10,17 +10,12 @@ class dataCreate:
     def __init__(self,selectedLabel,n_steps=30,joints=20):
         self.selectedLabel = selectedLabel
         self.n_steps = n_steps
-        self.joints = joints    #in the kinect it is 25 X 3(x,y,z)
-        # self.data = np.array([])
-        # self.dataLabel = np.array([])
-        # self.test = np.array([])
-        # self.testLabel = np.array([])
+        # self.joints = joints   
+        self.joints = 14
         self.size = len( self.selectedLabel )
 
     # create vector label
     def labelCreate(self,label):
-        # local_label = self.selectedLabel.index(label)
-        # size = len( self.selectedLabel )
         labelArr = np.zeros([1,self.size])
         labelArr[0,label] = 1
         return labelArr
@@ -127,7 +122,8 @@ class dataCreate:
         self.skeleton,self.label,self.test_skeleton,self.test_label = self.testCreate()
     
     def data_import(self):
-        temp = np.load("LSTM_Train/PKUMMD1.npz")
+        # temp = np.load("LSTM_Train/PKUMMD1.npz")
+        temp = np.load("LSTM_Train/PKUMMD3.npz")
         self.skeleton =  temp['skeleton']
         self.label = temp['label']
         self.test_skeleton = temp['test_skeleton']
@@ -158,13 +154,8 @@ class dataCreate:
 if __name__ == "__main__":    
     test = dataCreate([11,13,19,41])
     test.run()
-    # test.data_import()
-    # data,dataLabel = test.next_batch()
-    # data,label = test.labelCreate(data)
     print(test.skeleton.shape)
-    # print(dataLabel.shape)
-    # print(data[-1,-1,0])
-    # print(dataLabel[-1])
-    # print(test.shape)
-    np.savez("LSTM_Train/PKUMMD1.npz",skeleton=test.skeleton,label=test.label,\
+    # np.savez("LSTM_Train/PKUMMD1.npz",skeleton=test.skeleton,label=test.label,\
+    #     test_skeleton=test.test_skeleton,test_label=test.test_label)
+    np.savez("LSTM_Train/PKUMMD3.npz",skeleton=test.skeleton,label=test.label,\
         test_skeleton=test.test_skeleton,test_label=test.test_label)

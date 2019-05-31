@@ -6,8 +6,8 @@ class lstm():
     def __init__(self):
         self.sess = tf.Session()
         # import model
-        saver = tf.train.import_meta_graph('LSTM_Train/Model/model.ckpt.meta')
-        saver.restore(self.sess,tf.train.latest_checkpoint('LSTM_Train/Model'))
+        saver = tf.train.import_meta_graph('LSTM_Train/Model2/model.ckpt.meta')
+        saver.restore(self.sess,tf.train.latest_checkpoint('LSTM_Train/Model2'))
        
         graph = tf.get_default_graph()
          # initialize input

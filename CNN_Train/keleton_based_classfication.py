@@ -17,8 +17,10 @@ def max_pool(x,size):
 label_size = 4
 
 with tf.name_scope('input'):
-        x_skeleton = tf.placeholder(tf.float32,[None,29,20,3],name='x_skeleton')
-        x_motion = tf.placeholder(tf.float32,[None,29,20,3],name='x_motion')
+        # x_skeleton = tf.placeholder(tf.float32,[None,29,20,3],name='x_skeleton')
+        # x_motion = tf.placeholder(tf.float32,[None,29,20,3],name='x_motion')
+        x_skeleton = tf.placeholder(tf.float32,[None,29,14,3],name='x_skeleton')
+        x_motion = tf.placeholder(tf.float32,[None,29,14,3],name='x_motion')
         y_ = tf.placeholder(tf.float32,[None,label_size],name='y_prediction')
         keep_prob = tf.placeholder(tf.float32,name='keep_prob')
 
@@ -52,20 +54,22 @@ with tf.name_scope('concat'):
 #============================fully connected============================
 
 with tf.name_scope('fully_connected_layer'):
-        W_fc1 = weight_variable([2*8*5*128,64])
-        b_fc1 = bias_variable([64])
-        x_concat_flat = tf.reshape(x_concat,[-1,2*8*5*128])
+        # W_fc1 = weight_variable([2*8*5*128,64])
+        W_fc1 = weight_variable([2*8*4*128,32])
+        b_fc1 = bias_variable([32])
+        # x_concat_flat = tf.reshape(x_concat,[-1,2*8*5*128])
+        x_concat_flat = tf.reshape(x_concat,[-1,2*8*4*128])
         h_fc1 = tf.nn.leaky_relu(tf.matmul(x_concat_flat,W_fc1) + b_fc1 )
         h_fc1_drop = tf.nn.dropout(h_fc1,keep_prob)
 
-        W_fc2 = weight_variable([64, 32])
-        b_fc2 = bias_variable([32])
-        h_fc2 = tf.nn.leaky_relu(tf.matmul(h_fc1_drop,W_fc2) + b_fc2)
-        h_fc2_drop = tf.nn.dropout(h_fc2,keep_prob)
+        # W_fc2 = weight_variable([64, 32])
+        # b_fc2 = bias_variable([32])
+        # h_fc2 = tf.nn.leaky_relu(tf.matmul(h_fc1_drop,W_fc2) + b_fc2)
+        # h_fc2_drop = tf.nn.dropout(h_fc2,keep_prob)
 
         W_fc3 = weight_variable([32, 16])
         b_fc3 = bias_variable([16])
-        h_fc3 = tf.nn.leaky_relu(tf.matmul(h_fc2_drop,W_fc3) + b_fc3)
+        h_fc3 = tf.nn.leaky_relu(tf.matmul(h_fc1_drop,W_fc3) + b_fc3)
         h_fc3_drop = tf.nn.dropout(h_fc3,keep_prob)
 
         W_fc4 = weight_variable([16, 8])
@@ -105,8 +109,8 @@ saver = tf.train.Saver()
 _batch_size = 200
 with tf.Session() as sess:
     sess.run(init)
-    train_writer = tf.summary.FileWriter("CNN_Train/log/train",sess.graph)
-    test_writer = tf.summary.FileWriter("CNN_Train/log/test",sess.graph)
+    train_writer = tf.summary.FileWriter("CNN_Train/logs/train",sess.graph)
+    test_writer = tf.summary.FileWriter("CNN_Train/logs/test",sess.graph)
     # training
     for i in range(450):
         
@@ -121,6 +125,6 @@ with tf.Session() as sess:
         test_writer.add_summary(test_result,i+1)
 
     print("Optimization Finished!")
-    saver.save(sess,"CNN_Train/Model/model.ckpt")
+    saver.save(sess,"CNN_Train/Model2/model.ckpt")
     # prediction
     print("Testing Accuracy:", sess.run(accuracy, feed_dict={x_skeleton:test_skeleton,x_motion:test_motion, y_:test_label, keep_prob:1}))

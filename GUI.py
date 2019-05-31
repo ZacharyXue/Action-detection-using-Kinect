@@ -8,6 +8,10 @@ from pykinect2.PyKinectV2 import *
 from pykinect2 import PyKinectRuntime
 
 import cv2 
+import numpy as np
+
+from CNN_Train.cnn_model import cnn
+from LSTM_Train.lstm_model import lstm
 
 class basic_desk():
     def __init__(self,master):
@@ -77,9 +81,9 @@ class basic_desk():
         self.label = StringVar()
 
         if self.model_type == 'LSTM':
-            pass
+            self.model = lstm
         elif self.model_type =='CNN':
-            pass
+            self.model = cnn
 
         if self.skeleton_type == 'Kinect':
             pass
@@ -104,7 +108,7 @@ class basic_desk():
             success = True
 
         if success:
-            
+            pass
         self.detect_frame.after(1,self.loop)
 
 

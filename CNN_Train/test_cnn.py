@@ -11,8 +11,8 @@ data.data_import()
 
 sess = tf.Session()
 # import model
-saver = tf.train.import_meta_graph('CNN_Train/Model/model.ckpt.meta')
-saver.restore(sess,tf.train.latest_checkpoint('CNN_Train/Model'))
+saver = tf.train.import_meta_graph('CNN_Train/Model2/model.ckpt.meta')
+saver.restore(sess,tf.train.latest_checkpoint('CNN_Train/Model2'))
 # initialize input
 graph = tf.get_default_graph()
 x_skeleton = graph.get_tensor_by_name("input/x_skeleton:0")

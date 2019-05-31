@@ -12,7 +12,7 @@ class dataCreate:
         self.joints = joints 
 
     def data_init(self):
-        temp = np.load("LSTM_Train/PKUMMD1.npz")
+        temp = np.load("LSTM_Train/PKUMMD3.npz")
         self.skeleton =  temp['skeleton']
         self.label = temp['label']
         self.test_skeleton = temp['test_skeleton']
@@ -20,21 +20,27 @@ class dataCreate:
 
     def motion_create(self):
         self.motion = self.skeleton[:,1:] - self.skeleton[:,:-1]
-        self.motion = np.reshape(self.motion,[-1,29,20,3])
+        # self.motion = np.reshape(self.motion,[-1,29,20,3])
+        self.motion = np.reshape(self.motion,[-1,29,14,3])
+
         self.skeleton = self.skeleton[:,1:]
-        self.skeleton = np.reshape(self.skeleton,[-1,29,20,3])
+        # self.skeleton = np.reshape(self.skeleton,[-1,29,20,3])
+        self.skeleton = np.reshape(self.skeleton,[-1,29,14,3])
+
 
         self.test_motion = self.test_skeleton[:,1:] - self.test_skeleton[:,:-1]
-        self.test_motion = np.reshape(self.test_motion,[-1,29,20,3])
+        # self.test_motion = np.reshape(self.test_motion,[-1,29,20,3])
+        self.test_motion = np.reshape(self.test_motion,[-1,29,14,3])
         self.test_skeleton = self.test_skeleton[:,1:]
-        self.test_skeleton = np.reshape(self.test_skeleton,[-1,29,20,3])
-    
+        # self.test_skeleton = np.reshape(self.test_skeleton,[-1,29,20,3])
+        self.test_skeleton = np.reshape(self.test_skeleton,[-1,29,14,3])
+   
     def run(self):
         self.data_init()
         self.motion_create()
 
     def data_import(self):
-        temp = np.load("CNN_Train/PKUMMD2.npz")
+        temp = np.load("CNN_Train/PKUMMD4.npz")
         self.skeleton =  temp['skeleton']
         self.motion = temp['motion']
         self.label = temp['label']
@@ -78,5 +84,5 @@ if __name__ == "__main__":
     # print(data[-1,-1,0])
     # print(dataLabel[-1])
     # print(test.shape)
-    np.savez("CNN_Train/PKUMMD2.npz",skeleton=test.skeleton,motion=test.motion,label=test.label,\
+    np.savez("CNN_Train/PKUMMD4.npz",skeleton=test.skeleton,motion=test.motion,label=test.label,\
         test_skeleton=test.test_skeleton,test_motion=test.test_motion,test_label=test.test_label)

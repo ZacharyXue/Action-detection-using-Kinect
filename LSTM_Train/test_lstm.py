@@ -9,8 +9,8 @@ data.data_import()
 
 sess = tf.Session()
 # import model
-saver = tf.train.import_meta_graph('LSTM_Train/Model/model.ckpt.meta')
-saver.restore(sess,tf.train.latest_checkpoint('LSTM_Train/Model'))
+saver = tf.train.import_meta_graph('LSTM_Train/Model2/model.ckpt.meta')
+saver.restore(sess,tf.train.latest_checkpoint('LSTM_Train/Model2'))
 # initialize input
 graph = tf.get_default_graph()
 x_input = graph.get_tensor_by_name("inputs/x_input:0")

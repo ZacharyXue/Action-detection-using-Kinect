@@ -6,17 +6,17 @@ tf.reset_default_graph()
 ## learning rate test
 # Hyper Parameters
 learning_rate = 0.005    # 学习率
-n_inputs = 60           # 输入节点数
-n_hiddens = [ 200 ]         # 隐层节点数
+n_hiddens = [ 100 ]         # 隐层节点数
 n_classes = 4          # 输出节点数（分类数目）
 
 # data
-data = dataCreate(selectedLabel=[11,13,19,41],joints=n_inputs)
+data = dataCreate(selectedLabel=[11,13,19,41])
 data.data_import()
 
 # tensor placeholder
 with tf.name_scope('inputs'):
-    x = tf.placeholder(tf.float32, [None, None, 60], name='x_input')     # 输入
+    # x = tf.placeholder(tf.float32, [None, None, 60], name='x_input')     # 输入
+    x = tf.placeholder(tf.float32, [None, None, 42], name='x_input')     # 输入
     y = tf.placeholder(tf.float32, [None, n_classes], name='y_input')               # 输出
     keep_prob = tf.placeholder(tf.float32, name='keep_prob_input')           # 保持多少不被 dropout
     batch_size = tf.placeholder(tf.int32, [], name='batch_size_input')       # 批大小
@@ -84,7 +84,7 @@ with tf.Session() as sess:
     train_writer = tf.summary.FileWriter("LSTM_Train/logs/train",sess.graph)
     test_writer = tf.summary.FileWriter("LSTM_Train/logs/test",sess.graph)
     # training
-    for i in range(300):
+    for i in range(400):
         
         batch_x, batch_y = data.next_batch(i,_batch_size)
         test,testLabel = data.next_batch(i,flag=1)
@@ -97,6 +97,6 @@ with tf.Session() as sess:
         test_writer.add_summary(test_result,i+1)
 
     print("Optimization Finished!")
-    saver.save(sess,"LSTM_Train/Model/model.ckpt")
+    saver.save(sess,"LSTM_Train/Model2/model.ckpt")
     # prediction
     print("Testing Accuracy:", sess.run(accuracy, feed_dict={x:test, y:testLabel, keep_prob:1.0, batch_size:_batch_size}))

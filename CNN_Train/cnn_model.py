@@ -6,8 +6,8 @@ class cnn():
     def __init__(self):
         self.sess = tf.Session()
         # import model
-        saver = tf.train.import_meta_graph('CNN_Train/Model/model.ckpt.meta')
-        saver.restore(self.sess,tf.train.latest_checkpoint('CNN_Train/Model'))
+        saver = tf.train.import_meta_graph('CNN_Train/Model2/model.ckpt.meta')
+        saver.restore(self.sess,tf.train.latest_checkpoint('CNN_Train/Model2'))
         
         graph = tf.get_default_graph()     
         # initialize input

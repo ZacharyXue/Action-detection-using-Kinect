@@ -17,7 +17,6 @@ class preprocessing():
         rotate_mat[1] = origin_y
         rotate_mat[2] = origin_z
         rotate_mat = np.array(rotate_mat)
-        # print(rotate_mat)
         rotate_mat = np.linalg.inv(rotate_mat)
         self.local_pos = np.matmul(self.local_pos,rotate_mat)
 
@@ -25,11 +24,16 @@ class preprocessing():
         data_norm = np.array([],dtype=float)
         data = self.local_pos
 
-        joint_data = [[3,2],[2,20],[20,1],[1,0],\
-            [0,12],[12,13],[13,14],[14,15],\
-                [0,16],[16,17],[17,18],[18,19],\
-                    [20,4],[4,5],[5,6],[6,7],\
-                        [20,8],[8,9],[9,10],[10,11]]
+        # joint_data = [[3,2],[2,20],[20,1],[1,0],\
+        #     [0,12],[12,13],[13,14],[14,15],\
+        #         [0,16],[16,17],[17,18],[18,19],\
+        #             [20,4],[4,5],[5,6],[6,7],\
+        #                 [20,8],[8,9],[9,10],[10,11]]
+        joint_data = [[2,20],[20,12],[20,16],\
+            [12,16],[12,13],[13,14],\
+                [16,17],[17,18],\
+                    [20,4],[4,5],[5,6],\
+                        [20,8],[8,9],[9,10]]
         for joint in joint_data:
             temp = data[joint[0],:]-data[joint[1],:]
             data_temp = temp / np.linalg.norm(temp)
@@ -44,13 +48,16 @@ class preprocessing():
             self.local_pos = pos
             gate = np.zeros(self.local_pos.shape)
             if self.local_pos.all() == gate.all():
-                norm = np.zeros([20,3])
+                # norm = np.zeros([20,3])
+                norm = np.zeros([14,3])
             else:
                 self.transform()
-                self.rotate([1,0,8,4])
+                # self.rotate([1,0,8,4])
+                self.rotate([3,20,8,4])
                 norm = self.normalize()
             norm_array = np.append(norm_array,norm)
-        norm_array = np.reshape(norm_array,[-1,60])
+        # norm_array = np.reshape(norm_array,[-1,60])
+        norm_array = np.reshape(norm_array,[-1,42])
         return norm_array
 
 if __name__ == "__main__":
