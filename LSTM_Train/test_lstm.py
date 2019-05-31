@@ -3,10 +3,8 @@ import numpy as np
 from data_import import dataCreate
 
 
-n_inputs = 60           # 输入节点数
-
 # data
-data = dataCreate(selectedLabel=[11,13,19,41],joints=n_inputs)
+data = dataCreate(selectedLabel=[11,13,19,41])
 data.data_import()
 
 sess = tf.Session()

@@ -1,10 +1,8 @@
 import numpy as np
 
 class preprocessing():
-    def __init__(self,joints=25,time=200,pos=np.array([])):
-        self.joints = joints
+    def __init__(self,pos=np.array([])):
         self.pos = np.reshape(pos,[-1,25,3])
-        self.time = time
 
     def transform(self):
         o = self.local_pos[0]
