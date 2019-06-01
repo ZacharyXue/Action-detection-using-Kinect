@@ -14,13 +14,13 @@ def conv2d(x,W):
 def max_pool(x,size):
     return tf.nn.max_pool(x,ksize=size,strides = [1,2,2,1],padding='SAME',name='max_pool')
 
-label_size = 4
+label_size = 7
 
 with tf.name_scope('input'):
-        # x_skeleton = tf.placeholder(tf.float32,[None,29,20,3],name='x_skeleton')
-        # x_motion = tf.placeholder(tf.float32,[None,29,20,3],name='x_motion')
-        x_skeleton = tf.placeholder(tf.float32,[None,29,14,3],name='x_skeleton')
-        x_motion = tf.placeholder(tf.float32,[None,29,14,3],name='x_motion')
+        x_skeleton = tf.placeholder(tf.float32,[None,29,20,3],name='x_skeleton')
+        x_motion = tf.placeholder(tf.float32,[None,29,20,3],name='x_motion')
+        # x_skeleton = tf.placeholder(tf.float32,[None,29,14,3],name='x_skeleton')
+        # x_motion = tf.placeholder(tf.float32,[None,29,14,3],name='x_motion')
         y_ = tf.placeholder(tf.float32,[None,label_size],name='y_prediction')
         keep_prob = tf.placeholder(tf.float32,name='keep_prob')
 
@@ -54,11 +54,11 @@ with tf.name_scope('concat'):
 #============================fully connected============================
 
 with tf.name_scope('fully_connected_layer'):
-        # W_fc1 = weight_variable([2*8*5*128,64])
-        W_fc1 = weight_variable([2*8*4*128,32])
+        W_fc1 = weight_variable([2*8*5*128,32])
+        # W_fc1 = weight_variable([2*8*4*128,32])
         b_fc1 = bias_variable([32])
-        # x_concat_flat = tf.reshape(x_concat,[-1,2*8*5*128])
-        x_concat_flat = tf.reshape(x_concat,[-1,2*8*4*128])
+        x_concat_flat = tf.reshape(x_concat,[-1,2*8*5*128])
+        # x_concat_flat = tf.reshape(x_concat,[-1,2*8*4*128])
         h_fc1 = tf.nn.leaky_relu(tf.matmul(x_concat_flat,W_fc1) + b_fc1 )
         h_fc1_drop = tf.nn.dropout(h_fc1,keep_prob)
 
@@ -125,6 +125,6 @@ with tf.Session() as sess:
         test_writer.add_summary(test_result,i+1)
 
     print("Optimization Finished!")
-    saver.save(sess,"CNN_Train/Model2/model.ckpt")
+    saver.save(sess,"CNN_Train/Model3/model.ckpt")
     # prediction
     print("Testing Accuracy:", sess.run(accuracy, feed_dict={x_skeleton:test_skeleton,x_motion:test_motion, y_:test_label, keep_prob:1}))

@@ -7,12 +7,11 @@ class dataCreate:
     selectedLabel needs to input labels which is selected as training target;
     joints is setted as Kinect skeleton joints as default.
     '''
-    def __init__(self,selectedLabel,n_steps=30,joints=20):
-        self.selectedLabel = selectedLabel
+    def __init__(self,n_steps=30,joints=20):
         self.n_steps = n_steps
         # self.joints = joints   
-        self.joints = 14
-        self.size = len( self.selectedLabel )
+        self.joints = 20
+        self.size = 7
 
     # create vector label
     def labelCreate(self,label):
@@ -65,25 +64,21 @@ class dataCreate:
         all_skeleton = np.array([])
         all_label = np.array([])
 
-        lastStrList = ['L','M','R']
-        for num in self.selectedLabel:
-            for i in range(1,27):
-                for j in range(1,14):
-                    for lastStr in lastStrList:
-                        try:
-                            # ====pay attention to this address, every time move python file, remember to change it====#
-                            rawData = np.loadtxt('LSTM_Train/data/{}/A{:0>2d}N{:0>2d}-{}.txt'.format(num,i,j,lastStr))
-                        except:
-                            pass
-                        else:
-                            _pre = preprocessing(pos=rawData)
-                            _skeleton = _pre.run()
-                            # print("_data size is {}".format(_data.shape))
-                            label = self.selectedLabel.index(num)                        
-                            skeleton,label = self.add2List(_skeleton,label)
-                            all_skeleton = np.append(all_skeleton,skeleton)
-                            all_label = np.append(all_label,label)
-                            # print("allData size is {}".format(allData.shape))
+        for i in range(7):
+            for j in range(17):
+                try:
+                    # ====pay attention to this address, every time move python file, remember to change it====#
+                    rawData = np.loadtxt('LSTM_Train/data/{}/{}.txt'.format(i,j))
+                except:
+                    pass
+                else:
+                    _pre = preprocessing(pos=rawData)
+                    _skeleton = _pre.run()
+                    # print("_data size is {}".format(_data.shape))                        
+                    skeleton,label = self.add2List(_skeleton,i)
+                    all_skeleton = np.append(all_skeleton,skeleton)
+                    all_label = np.append(all_label,label)
+                    # print("allData size is {}".format(allData.shape))
 
         all_label = np.reshape(all_label,[-1,self.size])
         all_skeleton = np.reshape(all_skeleton,[-1,self.n_steps,self.joints*3])
@@ -123,7 +118,7 @@ class dataCreate:
     
     def data_import(self):
         # temp = np.load("LSTM_Train/PKUMMD1.npz")
-        temp = np.load("LSTM_Train/PKUMMD3.npz")
+        temp = np.load("LSTM_Train/data.npz")
         self.skeleton =  temp['skeleton']
         self.label = temp['label']
         self.test_skeleton = temp['test_skeleton']
@@ -152,10 +147,10 @@ class dataCreate:
 
 # try to find out the class if it works or not
 if __name__ == "__main__":    
-    test = dataCreate([11,13,19,41])
+    test = dataCreate()
     test.run()
     print(test.skeleton.shape)
     # np.savez("LSTM_Train/PKUMMD1.npz",skeleton=test.skeleton,label=test.label,\
     #     test_skeleton=test.test_skeleton,test_label=test.test_label)
-    np.savez("LSTM_Train/PKUMMD3.npz",skeleton=test.skeleton,label=test.label,\
+    np.savez("LSTM_Train/data.npz",skeleton=test.skeleton,label=test.label,\
         test_skeleton=test.test_skeleton,test_label=test.test_label)

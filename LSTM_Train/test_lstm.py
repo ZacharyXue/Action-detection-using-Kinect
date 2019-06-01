@@ -4,13 +4,13 @@ from data_import import dataCreate
 
 
 # data
-data = dataCreate(selectedLabel=[11,13,19,41])
+data = dataCreate()
 data.data_import()
 
 sess = tf.Session()
 # import model
-saver = tf.train.import_meta_graph('LSTM_Train/Model2/model.ckpt.meta')
-saver.restore(sess,tf.train.latest_checkpoint('LSTM_Train/Model2'))
+saver = tf.train.import_meta_graph('LSTM_Train/Model3/model.ckpt.meta')
+saver.restore(sess,tf.train.latest_checkpoint('LSTM_Train/Model3'))
 # initialize input
 graph = tf.get_default_graph()
 x_input = graph.get_tensor_by_name("inputs/x_input:0")
@@ -31,7 +31,7 @@ for i in range(5):
     y_pred=np.append(y_pred,np.argmax(y_pred_temp,1))
     y=np.append(y,np.argmax(batch_y,1))
 
-op = tf.confusion_matrix(labels=y,predictions=y_pred,num_classes=4,dtype=tf.float32)
+op = tf.confusion_matrix(labels=y,predictions=y_pred,num_classes=7,dtype=tf.float32)
 print(sess.run(op))
 
 sess.close()

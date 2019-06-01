@@ -2,17 +2,14 @@ import tensorflow as tf
 import numpy as np
 from data_import import dataCreate
 
-
-n_inputs = 60           # 输入节点数
-
 # data
 data = dataCreate()
 data.data_import()
 
 sess = tf.Session()
 # import model
-saver = tf.train.import_meta_graph('CNN_Train/Model2/model.ckpt.meta')
-saver.restore(sess,tf.train.latest_checkpoint('CNN_Train/Model2'))
+saver = tf.train.import_meta_graph('CNN_Train/Model3/model.ckpt.meta')
+saver.restore(sess,tf.train.latest_checkpoint('CNN_Train/Model3'))
 # initialize input
 graph = tf.get_default_graph()
 x_skeleton = graph.get_tensor_by_name("input/x_skeleton:0")
@@ -34,7 +31,7 @@ for i in range(5):
     y_pred=np.append(y_pred,y_pred_temp)
     y=np.append(y,np.argmax(batch_y,1))
 
-op = tf.confusion_matrix(labels=y,predictions=y_pred,num_classes=4,dtype=tf.float32)
+op = tf.confusion_matrix(labels=y,predictions=y_pred,num_classes=7,dtype=tf.float32)
 print(sess.run(op))
 
 sess.close()

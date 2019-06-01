@@ -7,16 +7,16 @@ tf.reset_default_graph()
 # Hyper Parameters
 learning_rate = 0.005    # 学习率
 n_hiddens = [ 100 ]         # 隐层节点数
-n_classes = 4          # 输出节点数（分类数目）
+n_classes = 7          # 输出节点数（分类数目）
 
 # data
-data = dataCreate(selectedLabel=[11,13,19,41])
+data = dataCreate()
 data.data_import()
 
 # tensor placeholder
 with tf.name_scope('inputs'):
-    # x = tf.placeholder(tf.float32, [None, None, 60], name='x_input')     # 输入
-    x = tf.placeholder(tf.float32, [None, None, 42], name='x_input')     # 输入
+    x = tf.placeholder(tf.float32, [None, None, 60], name='x_input')     # 输入
+    # x = tf.placeholder(tf.float32, [None, None, 42], name='x_input')     # 输入
     y = tf.placeholder(tf.float32, [None, n_classes], name='y_input')               # 输出
     keep_prob = tf.placeholder(tf.float32, name='keep_prob_input')           # 保持多少不被 dropout
     batch_size = tf.placeholder(tf.int32, [], name='batch_size_input')       # 批大小
@@ -44,10 +44,6 @@ with tf.name_scope('LSTM'):
         with tf.name_scope('lstm_cells_layers'):
             lstm_forward = tf.nn.rnn_cell.MultiRNNCell(lstm_forward_cell, state_is_tuple=True)
             lstm_backward = tf.nn.rnn_cell.MultiRNNCell(lstm_backward_cell, state_is_tuple=True)
-        # # 全零初始化 state
-        # _init_state = mlstm_cell.zero_state(batch_size, dtype=tf.float32)
-        # # dynamic_rnn 运行网络
-        # outputs, states = tf.nn.dynamic_rnn(mlstm_cell, x, initial_state=_init_state, time_major=False)
 
         outputs, _=tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_forward,\
             cell_bw=lstm_backward,inputs=x,dtype=tf.float32)
@@ -84,7 +80,7 @@ with tf.Session() as sess:
     train_writer = tf.summary.FileWriter("LSTM_Train/logs/train",sess.graph)
     test_writer = tf.summary.FileWriter("LSTM_Train/logs/test",sess.graph)
     # training
-    for i in range(400):
+    for i in range(200):
         
         batch_x, batch_y = data.next_batch(i,_batch_size)
         test,testLabel = data.next_batch(i,flag=1)
@@ -97,6 +93,6 @@ with tf.Session() as sess:
         test_writer.add_summary(test_result,i+1)
 
     print("Optimization Finished!")
-    saver.save(sess,"LSTM_Train/Model2/model.ckpt")
+    saver.save(sess,"LSTM_Train/Model3/model.ckpt")
     # prediction
     print("Testing Accuracy:", sess.run(accuracy, feed_dict={x:test, y:testLabel, keep_prob:1.0, batch_size:_batch_size}))

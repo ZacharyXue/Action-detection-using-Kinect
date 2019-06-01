@@ -6,8 +6,8 @@ class lstm():
     def __init__(self):
         self.sess = tf.Session()
         # import model
-        saver = tf.train.import_meta_graph('LSTM_Train/Model/model.ckpt.meta')
-        saver.restore(self.sess,tf.train.latest_checkpoint('LSTM_Train/Model'))
+        saver = tf.train.import_meta_graph('LSTM_Train/Model3/model.ckpt.meta')
+        saver.restore(self.sess,tf.train.latest_checkpoint('LSTM_Train/Model3'))
        
         graph = tf.get_default_graph()
          # initialize input
@@ -16,7 +16,7 @@ class lstm():
         # initialize output
         self.output = graph.get_tensor_by_name("output_layer/Softmax:0")
 
-        self.label_dict = {0:'falling',1:'waving',2:'kicking',3:'throw'}
+        self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
 
     def data_input(self,data):      
         data_pre = pre(pos=data).run()
