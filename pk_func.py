@@ -6,6 +6,8 @@ import ctypes
 
 import math
 
+import numpy as np
+
 def draw_body_bone(joints, jointPoints, joint0, joint1,img):
     joint0State = joints[joint0].TrackingState
     joint1State = joints[joint1].TrackingState
@@ -87,3 +89,46 @@ def get_world_pos(kinect,skeletons):
         temp_pos = []
     
     return pos
+    
+def to_kinect(kinect,skeletons):
+    # get position
+    pos = get_world_pos(kinect,skeletons)
+    try:
+        temp_skeleton = np.array(pos[0])      
+    except:
+        skeleton = np.array([])
+    else:
+        # create output
+        skeleton = np.random.rand(1,75)
+        print(temp_skeleton.shape)
+        # 0->2
+        skeleton[0,2*3:3*3] = temp_skeleton[0*3:1*3]
+        # 1->20
+        skeleton[0,20*3:21*3] = temp_skeleton[1*3:2*3]
+        # 2->4
+        skeleton[0,4*3:5*3] = temp_skeleton[2*3:3*3]
+        # 3->5
+        skeleton[0,5*3:6*3] = temp_skeleton[3*3:4*3]
+        # 4->6
+        skeleton[0,6*3:7*3] = temp_skeleton[4*3:5*3]
+        # 5->8
+        skeleton[0,8*3:9*3] = temp_skeleton[5*3:6*3]
+        # 6->9
+        skeleton[0,9*3:10*3] = temp_skeleton[6*3:7*3]
+        # 7->10
+        skeleton[0,10*3:11*3] = temp_skeleton[7*3:8*3]
+        # 8->12
+        skeleton[0,12*3:13*3] = temp_skeleton[8*3:9*3]
+        # 9->13
+        skeleton[0,13*3:14*3] = temp_skeleton[9*3:10*3]
+        # 10->14
+        skeleton[0,14*3:15*3] = temp_skeleton[10*3:11*3]
+        # 11->16
+        skeleton[0,16*3:17*3] = temp_skeleton[11*3:12*3]
+        # 12->17
+        skeleton[0,17*3:18*3] = temp_skeleton[12*3:13*3]
+        # 13->18
+        skeleton[0,18*3:19*3] = temp_skeleton[13*3:14*3]
+        
+
+    return skeleton

@@ -6,8 +6,8 @@ class cnn():
     def __init__(self):
         self.sess = tf.Session()
         # import model
-        saver = tf.train.import_meta_graph('CNN_Train/Model2/model.ckpt.meta')
-        saver.restore(self.sess,tf.train.latest_checkpoint('CNN_Train/Model2'))
+        saver = tf.train.import_meta_graph('CNN_Train/Model/model.ckpt.meta')
+        saver.restore(self.sess,tf.train.latest_checkpoint('CNN_Train/Model'))
         
         graph = tf.get_default_graph()     
         # initialize input
@@ -24,17 +24,18 @@ class cnn():
     def data_input(self,data):
 
         self.Data = np.append(self.Data,data)
+        self.Data = np.reshape(self.Data,[-1,75])
+        print("The shape of data is {}".format(self.Data.shape[0]))
+        label = ' '
 
-        label = ''
-
-        if self.Data.shape == 30 * 75:
+        if self.Data.shape[0] == 30 :
             skeleton,motion = pre(pos=self.Data).run()
             self.Data = np.array([])
 
             y_pred = self.sess.run(self.output,feed_dict={self.x_skeleton:skeleton,\
                 self.x_motion:motion,self.keep_prob:1})
 
-            label = self.label_dict[y_pred]
+            label = self.label_dict[int(y_pred)]
 
         return label
         

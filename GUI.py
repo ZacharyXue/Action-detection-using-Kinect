@@ -22,7 +22,7 @@ from tf_pose.networks import get_graph_path, model_wh
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose import common
 
-from pk_func import get_world_pos,draw_body
+from pk_func import to_kinect,draw_body
 
 
 # Openpose Human pose detection ==============================================================
@@ -155,8 +155,9 @@ class basic_desk():
 
         # label info
         self.label = StringVar()
-        self.label.set('preparing')
-
+        self.last_label = 'preparing'
+        self.label.set(self.last_label)
+        
         if self.model_type.get() == 'LSTM':
             self.model = lstm()
         elif self.model_type.get() =='CNN':
@@ -208,16 +209,19 @@ class basic_desk():
                     humans = self.detector.detect(self.img)
                     skeletons,scale_y = self.detector.humans_to_skelsList(humans)
                     self.detector.draw(self.img,humans)
-                    pos = get_world_pos(self._kinect,skeletons)
-                    pos = np.array(pos[0])
-                    temp_joints = np.append(temp_joints,pos)
+                    # pos = get_world_pos(self._kinect,skeletons)
+                    # pos = np.array(pos[0])
+                    # temp_joints = np.append(temp_joints,pos)
+                    temp_joints = to_kinect(self._kinect,skeletons)
             # print(temp_joints.shape)
-            # if temp_joints.shape[0] != 0:
-            #     # input data and output label
-            #     print(temp_joints)
-            #     temp_label = self.model.data_input(temp_joints)
-            #     print(temp_label)
-            #     self.label.set(temp_label)
+            if temp_joints.shape[0] != 0:
+                # input data and output label
+                # print(temp_joints)
+                temp_label = self.model.data_input(temp_joints)
+                if temp_label != ' ':
+                    self.last_label = temp_label
+                # print(temp_label)
+                self.label.set(self.last_label)
             # output image
             self.img = cv2.resize(self.img,(640,480))
             current_img = Image.fromarray(self.img)
