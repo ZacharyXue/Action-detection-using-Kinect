@@ -2,6 +2,10 @@ from pykinect2 import PyKinectV2
 from pykinect2.PyKinectV2 import *
 import cv2
 
+import ctypes
+
+import math
+
 def draw_body_bone(joints, jointPoints, joint0, joint1,img):
     joint0State = joints[joint0].TrackingState
     joint1State = joints[joint1].TrackingState
@@ -52,3 +56,34 @@ def draw_body(joints, jointPoints,img):
     draw_body_bone(joints, jointPoints,  PyKinectV2.JointType_HipLeft, PyKinectV2.JointType_KneeLeft,img)
     draw_body_bone(joints, jointPoints,  PyKinectV2.JointType_KneeLeft, PyKinectV2.JointType_AnkleLeft,img)
     draw_body_bone(joints, jointPoints,  PyKinectV2.JointType_AnkleLeft, PyKinectV2.JointType_FootLeft,img)
+
+    return img
+
+def get_world_pos(kinect,skeletons):
+    width, height = kinect.color_frame_desc.width, kinect.color_frame_desc.height
+    cameraPoint_capacity = ctypes.c_uint(width * height)
+    cameraPoint_data_type = PyKinectV2._CameraSpacePoint * cameraPoint_capacity.value
+
+    cameraPointCount = ctypes.POINTER(PyKinectV2._CameraSpacePoint)
+    cameraPointCount = ctypes.cast(cameraPoint_data_type(), ctypes.POINTER(PyKinectV2._CameraSpacePoint))
+    kinect._mapper.MapColorFrameToCameraSpace(kinect._depth_frame_data_capacity,kinect._depth_frame_data,\
+        cameraPoint_capacity,cameraPointCount)
+
+    pos = []
+    temp_pos = []
+    for skeleton in skeletons:
+        k = int(len(skeleton) / 2)
+        for i in range(k):
+            x = skeleton[2*i]
+            y = skeleton[2 * i + 1]
+            if math.isinf(x):
+                x = 0
+            if math.isinf(y):
+                y = 0
+            temp_pos.append(cameraPointCount[int(x * width + y)].x)
+            temp_pos.append(cameraPointCount[int(x * width + y)].y)
+            temp_pos.append(cameraPointCount[int(x * width + y)].z)
+        pos.append(temp_pos)
+        temp_pos = []
+    
+    return pos

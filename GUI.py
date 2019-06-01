@@ -22,7 +22,8 @@ from tf_pose.networks import get_graph_path, model_wh
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose import common
 
-from pk_func import draw_body
+from pk_func import get_world_pos,draw_body
+
 
 # Openpose Human pose detection ==============================================================
 
@@ -154,15 +155,18 @@ class basic_desk():
 
         # label info
         self.label = StringVar()
+        self.label.set('preparing')
 
-        if self.model_type == 'LSTM':
-            self.model = lstm
-        elif self.model_type =='CNN':
-            self.model = cnn
-        
-        if self.skeleton_type == 'OpenPose':
+        if self.model_type.get() == 'LSTM':
+            self.model = lstm()
+        elif self.model_type.get() =='CNN':
+            self.model = cnn()
+        # print(self.model_type)
+        if self.skeleton_type.get() == 'OpenPose':
             self.detector = SkeletonDetector("mobilenet_thin","640x480")
-
+        # image panel
+        self.panel = Label(self.detect_frame)
+        self.panel.pack()
         self.loop()
 
         # label info2
@@ -177,12 +181,13 @@ class basic_desk():
             success = False
         else:
             img = np.reshape(img,[1080,1920,4])
-            self.img = cv2.cvtColor(img,cv2.COLOR_RGBA2RGB)
+            self.img = cv2.cvtColor(img,cv2.COLOR_BGRA2RGB)           
             success = True
 
         if success:
             temp_joints = np.array([],dtype=float)
-            if self.skeleton_type == 'Kinect':
+            # get skeleton
+            if self.skeleton_type.get() == 'Kinect':
                 if self._kinect.has_new_body_frame(): 
                     self._bodies = self._kinect.get_last_body_frame()
                     for i in range(0, self._kinect.max_body_count):
@@ -192,18 +197,34 @@ class basic_desk():
                         joints = body.joints 
                         # convert joint coordinates to color space 
                         joint_points = self._kinect.body_joints_to_color_space(joints)
-                        draw_body(joints, joint_points,self.img)
+                        # self.draw_body(joints, joint_points)
+                        self.img = draw_body(joints,joint_points,self.img)
                         for i in range(0,25):
                             temp_joints = np.append(temp_joints,joints[i].Position.x)
                             temp_joints = np.append(temp_joints,joints[i].Position.y)
                             temp_joints = np.append(temp_joints,joints[i].Position.z)
-            elif self.skeleton_type == 'OpenPose':
-                humans = self.detector.detect(self.img)
-                skeletons,scale_y = self.detector.humans_to_skelsList(humans)
-                self.detector.draw(self.img,humans)
-                self._kinect.color_frame_desc
+            elif self.skeleton_type.get() == 'OpenPose':
+                if self._kinect.has_new_depth_frame():
+                    humans = self.detector.detect(self.img)
+                    skeletons,scale_y = self.detector.humans_to_skelsList(humans)
+                    self.detector.draw(self.img,humans)
+                    pos = get_world_pos(self._kinect,skeletons)
+                    pos = np.array(pos[0])
+                    temp_joints = np.append(temp_joints,pos)
+            # print(temp_joints.shape)
+            # if temp_joints.shape[0] != 0:
+            #     # input data and output label
+            #     print(temp_joints)
+            #     temp_label = self.model.data_input(temp_joints)
+            #     print(temp_label)
+            #     self.label.set(temp_label)
+            # output image
+            self.img = cv2.resize(self.img,(640,480))
+            current_img = Image.fromarray(self.img)
+            imgtk = ImageTk.PhotoImage(image=current_img)
+            self.panel.imgtk = imgtk
+            self.panel.config(image=imgtk)
         self.detect_frame.after(1,self.loop)
-
 
 if __name__ == "__main__":
     # initialize Tk

@@ -57,7 +57,7 @@ class preprocessing():
                 norm = self.normalize()
             norm_array = np.append(norm_array,norm)
         # norm_array = np.reshape(norm_array,[-1,60])
-        norm_array = np.reshape(norm_array,[-1,42])
+        norm_array = np.reshape(norm_array,[-1,1,42])
         return norm_array
 
 if __name__ == "__main__":

@@ -22,5 +22,6 @@ class lstm():
         data_pre = pre(pos=data).run()
         y_pred = self.sess.run(self.output,feed_dict={self.x_input:data_pre,\
             self.keep_prob:1})
-        label = np.argmax(y_pred,1)
+        label = int(np.argmax(y_pred,1))
+        # print(label)
         return self.label_dict[label]
