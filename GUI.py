@@ -13,6 +13,81 @@ import numpy as np
 from CNN_Train.cnn_model import cnn
 from LSTM_Train.lstm_model import lstm
 
+import sys, os
+
+CURR_PATH = os.path.dirname(os.path.abspath(__file__))+"/"
+
+sys.path.append(CURR_PATH + "githubs/tf-pose-estimation")
+from tf_pose.networks import get_graph_path, model_wh
+from tf_pose.estimator import TfPoseEstimator
+from tf_pose import common
+
+from pk_func import draw_body
+
+# Openpose Human pose detection ==============================================================
+
+class SkeletonDetector(object):
+    # This func is copied from https://github.com/ildoonet/tf-pose-estimation
+    def __init__(self, model=None, image_size=None):
+        
+        if model is None:
+            model = "cmu"
+
+        if image_size is None:
+            image_size = "640x480" 
+
+        models = set({"mobilenet_thin", "cmu"})
+        self.model = model if model in models else "mobilenet_thin"
+        self.resize_out_ratio = 4.0
+
+        w, h = model_wh(image_size)
+        if w == 0 or h == 0:
+            e = TfPoseEstimator(get_graph_path(self.model),
+                                target_size=(432, 368))
+        else:
+            e = TfPoseEstimator(get_graph_path(self.model), target_size=(w, h))
+
+        self.w, self.h = w, h
+        self.e = e
+
+        self.cnt_image = 0
+
+    def detect(self, image):
+        self.cnt_image += 1
+        if self.cnt_image == 1:
+            self.image_h = image.shape[0]
+            self.image_w = image.shape[1]
+            self.scale_y = 1.0 * self.image_h / self.image_w
+
+        # Inference
+        humans = self.e.inference(image, resize_to_default=(self.w > 0 and self.h > 0),
+                                #   upsample_size=self.args.resize_out_ratio)
+                                  upsample_size=self.resize_out_ratio)
+
+
+        return humans
+    
+    def draw(self, img_disp, humans):
+        img_disp = TfPoseEstimator.draw_humans(img_disp, humans, imgcopy=False)
+
+    def humans_to_skelsList(self, humans, scale_y = None): # get (x, y * scale_y)
+        # type: humans: returned from self.detect()
+        # rtype: list[list[]]
+        if scale_y is None:
+            scale_y = self.scale_y
+        skeletons = []
+        NaN = 0
+        for human in humans:
+            skeleton = [NaN]*(18*2)
+            for i, body_part in human.body_parts.items(): # iterate dict
+                idx = body_part.part_idx
+                skeleton[2*idx]=body_part.x
+                skeleton[2*idx+1]=body_part.y * scale_y
+            skeletons.append(skeleton)
+        return skeletons, scale_y
+
+# ==============================================================
+
 class basic_desk():
     def __init__(self,master):
         self.master = master
@@ -84,12 +159,10 @@ class basic_desk():
             self.model = lstm
         elif self.model_type =='CNN':
             self.model = cnn
-
-        if self.skeleton_type == 'Kinect':
-            pass
-        elif self.skeleton_type == 'OpenPose':
-            pass
         
+        if self.skeleton_type == 'OpenPose':
+            self.detector = SkeletonDetector("mobilenet_thin","640x480")
+
         self.loop()
 
         # label info2
@@ -108,7 +181,27 @@ class basic_desk():
             success = True
 
         if success:
-            pass
+            temp_joints = np.array([],dtype=float)
+            if self.skeleton_type == 'Kinect':
+                if self._kinect.has_new_body_frame(): 
+                    self._bodies = self._kinect.get_last_body_frame()
+                    for i in range(0, self._kinect.max_body_count):
+                        body = self._bodies.bodies[i]
+                        if not body.is_tracked: 
+                            continue           
+                        joints = body.joints 
+                        # convert joint coordinates to color space 
+                        joint_points = self._kinect.body_joints_to_color_space(joints)
+                        draw_body(joints, joint_points,self.img)
+                        for i in range(0,25):
+                            temp_joints = np.append(temp_joints,joints[i].Position.x)
+                            temp_joints = np.append(temp_joints,joints[i].Position.y)
+                            temp_joints = np.append(temp_joints,joints[i].Position.z)
+            elif self.skeleton_type == 'OpenPose':
+                humans = self.detector.detect(self.img)
+                skeletons,scale_y = self.detector.humans_to_skelsList(humans)
+                self.detector.draw(self.img,humans)
+                self._kinect.color_frame_desc
         self.detect_frame.after(1,self.loop)
 
 
