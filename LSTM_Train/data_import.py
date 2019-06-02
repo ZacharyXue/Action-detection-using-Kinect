@@ -65,7 +65,7 @@ class dataCreate:
         all_label = np.array([])
 
         for i in range(7):
-            for j in range(17):
+            for j in range(19):
                 try:
                     # ====pay attention to this address, every time move python file, remember to change it====#
                     rawData = np.loadtxt('LSTM_Train/data/{}/{}.txt'.format(i,j))

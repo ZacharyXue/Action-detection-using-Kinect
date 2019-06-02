@@ -5,8 +5,8 @@ from data_import import dataCreate
 tf.reset_default_graph()
 ## learning rate test
 # Hyper Parameters
-learning_rate = 0.005    # 学习率
-n_hiddens = [ 100 ]         # 隐层节点数
+learning_rate = 0.001    # 学习率
+n_hiddens = [ 32,32,32,32,32 ]         # 隐层节点数
 n_classes = 7          # 输出节点数（分类数目）
 
 # data
@@ -80,7 +80,7 @@ with tf.Session() as sess:
     train_writer = tf.summary.FileWriter("LSTM_Train/logs/train",sess.graph)
     test_writer = tf.summary.FileWriter("LSTM_Train/logs/test",sess.graph)
     # training
-    for i in range(200):
+    for i in range(300):
         
         batch_x, batch_y = data.next_batch(i,_batch_size)
         test,testLabel = data.next_batch(i,flag=1)
@@ -93,6 +93,6 @@ with tf.Session() as sess:
         test_writer.add_summary(test_result,i+1)
 
     print("Optimization Finished!")
-    saver.save(sess,"LSTM_Train/Model3/model.ckpt")
+    saver.save(sess,"LSTM_Train/Model4/model.ckpt")
     # prediction
     print("Testing Accuracy:", sess.run(accuracy, feed_dict={x:test, y:testLabel, keep_prob:1.0, batch_size:_batch_size}))

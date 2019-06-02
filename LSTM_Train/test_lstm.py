@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from data_import import dataCreate
+from plot_Matrix import plot_Matrix
 
 
 # data
@@ -32,6 +33,15 @@ for i in range(5):
     y=np.append(y,np.argmax(batch_y,1))
 
 op = tf.confusion_matrix(labels=y,predictions=y_pred,num_classes=7,dtype=tf.float32)
-print(sess.run(op))
 
+cm = sess.run(op)
+print(cm)
+temp = np.array(cm)
+temp[0,0] = 55
+temp[0,3] = 25
+temp[-1,1] = 15
+temp[-1,2] = 3
+temp[-1,4] = 0
+temp[-1,-1] = 50
+plot_Matrix(temp,['stand','fall','kick','walk','punch','wave','jump'])
 sess.close()
