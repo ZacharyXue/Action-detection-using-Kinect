@@ -1,6 +1,10 @@
 import tensorflow as tf
 import numpy as np
-from data_import import dataCreate
+
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
+from mylib.data_import import dataCreate 
 
 tf.reset_default_graph()
 ## learning rate test
@@ -10,8 +14,9 @@ n_hiddens = [ 32,32,32,32,32 ]         # 隐层节点数
 n_classes = 7          # 输出节点数（分类数目）
 
 # data
-data = dataCreate()
-data.data_import()
+data = dataCreate(model='LSTM')
+data.data()
+
 
 # tensor placeholder
 with tf.name_scope('inputs'):

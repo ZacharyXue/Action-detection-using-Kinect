@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from CNN_Train.preprocess import preprocessing as pre
+from mylib.preprocess import preprocessing as pre
 
 class cnn():
     def __init__(self):
@@ -25,11 +25,11 @@ class cnn():
 
         self.Data = np.append(self.Data,data)
         self.Data = np.reshape(self.Data,[-1,75])
-        print("The shape of data is {}".format(self.Data.shape[0]))
+        # print("The shape of data is {}".format(self.Data.shape[0]))
         label = ' '
 
         if self.Data.shape[0] == 30 :
-            skeleton,motion = pre(pos=self.Data).run()
+            skeleton,motion = pre(pos=self.Data,model='CNN').run()
             self.Data = np.array([])
 
             y_pred = self.sess.run(self.output,feed_dict={self.x_skeleton:skeleton,\

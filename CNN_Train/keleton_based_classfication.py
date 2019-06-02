@@ -1,7 +1,10 @@
 import tensorflow as tf
 import numpy as np
-import random
-from data_import import dataCreate 
+
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
+from mylib.data_import import dataCreate 
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape,seed=1,stddev=0.1) 
@@ -101,8 +104,8 @@ merged_summary_op = tf.summary.merge_all()
 
 init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 
-data = dataCreate()
-data.data_import()
+data = dataCreate(model='CNN')
+data.data()
 
 saver = tf.train.Saver()
 

@@ -13,9 +13,9 @@ import numpy as np
 from CNN_Train.cnn_model import cnn
 from LSTM_Train.lstm_model import lstm
 
-from SkeletonDetector import SkeletonDetector
+from mylib.SkeletonDetector import SkeletonDetector
 
-from pk_func import to_kinect,draw_body
+from mylib.pk_func import to_kinect,draw_body
 
 class basic_desk():
     def __init__(self,master):
@@ -154,15 +154,16 @@ class basic_desk():
                     # pos = np.array(pos[0])
                     # temp_joints = np.append(temp_joints,pos)
                     temp_joints = to_kinect(self._kinect,skeletons) # I do not know it is right
-            # # print(temp_joints.shape)
-            # if temp_joints.shape[0] != 0:
-            #     # input data and output label
-            #     # print(temp_joints)
-            #     temp_label = self.model.data_input(temp_joints)
-            #     if temp_label != ' ':
-            #         self.last_label = temp_label
-            #     # print(temp_label)
-            #     self.label.set(self.last_label)
+
+            if temp_joints.shape[0] != 0:
+                # input data and output label
+                # print(temp_joints)
+                temp_label = self.model.data_input(temp_joints)
+                if temp_label != ' ':
+                    self.last_label = temp_label
+                # print(temp_label)
+                self.label.set(self.last_label)
+
             # output image
             self.img = cv2.resize(self.img,(640,480))
             current_img = Image.fromarray(self.img)

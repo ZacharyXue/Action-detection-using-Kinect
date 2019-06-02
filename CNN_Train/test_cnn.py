@@ -1,11 +1,15 @@
 import tensorflow as tf
 import numpy as np
-from data_import import dataCreate
-from plot_Matrix import plot_Matrix
+
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
+from mylib.data_import import dataCreate
+from mylib.plot_Matrix import plot_Matrix
 
 # data
-data = dataCreate()
-data.data_import()
+data = dataCreate(model='CNN')
+data.data()
 
 sess = tf.Session()
 # import model
