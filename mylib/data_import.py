@@ -60,7 +60,7 @@ class dataCreate:
         output: skeleton,label
         '''
         import os
-        from preprocess import preprocessing 
+        from mylib.preprocess import preprocessing 
 
         all_skeleton = np.array([])
         all_label = np.array([])

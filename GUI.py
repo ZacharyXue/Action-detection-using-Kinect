@@ -10,12 +10,8 @@ from pykinect2 import PyKinectRuntime
 import cv2 
 import numpy as np
 
-from CNN_Train.cnn_model import cnn
-from LSTM_Train.lstm_model import lstm
-
-from mylib.SkeletonDetector import SkeletonDetector
-
 from mylib.pk_func import to_kinect,draw_body
+from mylib.create_data import create_data
 
 class basic_desk():
     def __init__(self,master):
@@ -44,47 +40,95 @@ class basic_desk():
         self.basic.pack()
         # 标题
         Label(self.basic,text='Action Recognition',font=("Arial",15)).pack()
-
-        self.model_frame = Frame(self.basic)
-        self.model_frame.pack()
+        # =======================================================================
+        model_frame = Frame(self.basic)
+        model_frame.pack()
         # Choose Neural Model
         # Create label
-        model_label = Label(self.model_frame,text='The neural model: ')
+        model_label = Label(model_frame,text='The neural model: ')
         model_label.grid(row=1,column=0,rowspan=2,columnspan=2)
         
         self.model_type = StringVar()
         self.model_type.set('LSTM')
-        model_LSTM = Radiobutton(self.model_frame,text='LSTM',variable=self.model_type,value='LSTM')
+        model_LSTM = Radiobutton(model_frame,text='LSTM',variable=self.model_type,value='LSTM')
         model_LSTM.grid(row=5,column=1)
-        model_CNN = Radiobutton(self.model_frame,text='CNN',variable=self.model_type,value='CNN')
+        model_CNN = Radiobutton(model_frame,text='CNN',variable=self.model_type,value='CNN')
         model_CNN.grid(row=5,column=6)
-
-        self.skeleton_frame = Frame(self.basic)
-        self.skeleton_frame.pack()
+        # ===========================================================================
+        skeleton_frame = Frame(self.basic)
+        skeleton_frame.pack()
         # Choose the skeleton algorithm 
         # Create label
-        skeleton_label = Label(self.skeleton_frame,text='The skeleton algorithm: ')
+        skeleton_label = Label(skeleton_frame,text='The skeleton algorithm: ')
         skeleton_label.grid(row=1,column=0,rowspan=2,columnspan=2)
         
         self.skeleton_type = StringVar()
         self.skeleton_type.set('Kinect')
-        skeleton_Kinect = Radiobutton(self.skeleton_frame,text='Kinect',variable=self.skeleton_type,value='Kinect')
+        skeleton_Kinect = Radiobutton(skeleton_frame,text='Kinect',variable=self.skeleton_type,value='Kinect')
         skeleton_Kinect.grid(row=5,column=1)
-        skeleton_openpose = Radiobutton(self.skeleton_frame,text='OpenPose',variable=self.skeleton_type,value='OpenPose')
+        skeleton_openpose = Radiobutton(skeleton_frame,text='OpenPose',variable=self.skeleton_type,value='OpenPose')
         skeleton_openpose.grid(row=5,column=6)
+        # ===============================================================================
+        train_frame = Frame(self.basic)
+        train_frame.pack()
 
-        
+        train = Button(train_frame,text='Training',command=self.train_func)
+        train.grid(row=1,column=1)
+      
     def change_func(self):
         if  self.basic._name in self.master.children:
             self.basic.destroy()
             self.detect()
+        if self.train._name in self.master.children:
+            model = self.training_model.get()
+            create_data(model=model)
+            if model == 'LSTM':
+                pass
+            elif model == 'CNN':
+                pass
         # self.bottom_frame.destroy()
         # detect_desk(self.master,device=self.device,flag=flag)
 
     def back_func(self):
-        if self.detect_frame._name in self.master.children:
-            self.detect_frame.destroy()
-            self.basic_func()
+        # 不满意（︶^︶）
+        try:
+            if self.detect_frame._name in self.master.children:
+                self.detect_frame.destroy()
+                self.basic_func()
+        except:
+            pass
+        try:
+            if self.train._name in self.master.children:
+                self.train.destroy()
+                self.basic_func()
+        except:
+            pass
+
+    def train_func(self):
+        if  self.basic._name in self.master.children:
+            self.basic.destroy()
+        self.train = Frame(self.master,width=1000,height=1000)
+        self.train.pack()
+        # ===================================================================================
+        word = Frame(self.train)
+        word.pack()
+        Label(word,text='Action Recognition',font=("Arial",15)).pack()
+        Label(word,text='Training the model',font=("Arial",10)).pack()
+        # ====================================================================================
+        select = Frame(self.train)
+        select.pack()
+        # Choose Neural Model
+        # Create label
+        model_label = Label(select,text='The model to train : ')
+        model_label.grid(row=1,column=0,rowspan=2,columnspan=2)
+        
+        self.training_model = StringVar()
+        self.training_model.set('LSTM')
+        model_LSTM = Radiobutton(select,text='LSTM',variable=self.training_model,value='LSTM')
+        model_LSTM.grid(row=5,column=1)
+        model_CNN = Radiobutton(select,text='CNN',variable=self.training_model,value='CNN')
+        model_CNN.grid(row=5,column=6)
+
 
     def detect(self):
         # 初始化进入界面
@@ -99,11 +143,14 @@ class basic_desk():
         self.label.set(self.last_label)
         
         if self.model_type.get() == 'LSTM':
+            from LSTM_Train.lstm_model import lstm
             self.model = lstm()
         elif self.model_type.get() =='CNN':
+            from CNN_Train.cnn_model import cnn
             self.model = cnn()
         # print(self.model_type)
         if self.skeleton_type.get() == 'OpenPose':
+            from mylib.SkeletonDetector import SkeletonDetector
             self.detector = SkeletonDetector("mobilenet_thin","432x368")
         # image panel
         self.panel = Label(self.detect_frame)
