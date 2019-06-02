@@ -17,9 +17,12 @@ class preprocessing():
         rotate_mat[1] = origin_y
         rotate_mat[2] = origin_z
         rotate_mat = np.array(rotate_mat)
-        rotate_mat = np.linalg.inv(rotate_mat)
-        self.local_pos = np.matmul(self.local_pos,rotate_mat)
-
+        try:
+            rotate_mat = np.linalg.inv(rotate_mat)
+            self.local_pos = np.matmul(self.local_pos,rotate_mat)
+        except:
+            self.local_pos = np.zeros([60])
+            
     def normalize(self):
         data_norm = np.array([],dtype=float)
         data = self.local_pos
@@ -54,7 +57,10 @@ class preprocessing():
                 self.transform()
                 self.rotate([1,0,8,4])
                 # self.rotate([3,20,8,4])
-                norm = self.normalize()
+                if self.local_pos.all() != 0:
+                    norm = self.normalize()
+                else:
+                    norm = np.zeros([1,60])
             norm_array = np.append(norm_array,norm)
         norm_array = np.reshape(norm_array,[-1,1,60])
         # norm_array = np.reshape(norm_array,[-1,1,42])

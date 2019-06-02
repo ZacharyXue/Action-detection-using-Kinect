@@ -100,7 +100,7 @@ def to_kinect(kinect,skeletons):
     else:
         # create output
         skeleton = np.random.rand(1,75)
-        print(temp_skeleton.shape)
+        # print(temp_skeleton.shape)
         # 0->2
         skeleton[0,2*3:3*3] = temp_skeleton[0*3:1*3]
         # 1->20

@@ -13,94 +13,38 @@ import numpy as np
 from CNN_Train.cnn_model import cnn
 from LSTM_Train.lstm_model import lstm
 
-import sys, os
-
-CURR_PATH = os.path.dirname(os.path.abspath(__file__))+"/"
-
-sys.path.append(CURR_PATH + "githubs/tf-pose-estimation")
-from tf_pose.networks import get_graph_path, model_wh
-from tf_pose.estimator import TfPoseEstimator
-from tf_pose import common
+from SkeletonDetector import SkeletonDetector
 
 from pk_func import to_kinect,draw_body
 
-
-# Openpose Human pose detection ==============================================================
-
-class SkeletonDetector(object):
-    # This func is copied from https://github.com/ildoonet/tf-pose-estimation
-    def __init__(self, model=None, image_size=None):
-        
-        if model is None:
-            model = "cmu"
-
-        if image_size is None:
-            image_size = "640x480" 
-
-        models = set({"mobilenet_thin", "cmu"})
-        self.model = model if model in models else "mobilenet_thin"
-        self.resize_out_ratio = 4.0
-
-        w, h = model_wh(image_size)
-        if w == 0 or h == 0:
-            e = TfPoseEstimator(get_graph_path(self.model),
-                                target_size=(432, 368))
-        else:
-            e = TfPoseEstimator(get_graph_path(self.model), target_size=(w, h))
-
-        self.w, self.h = w, h
-        self.e = e
-
-        self.cnt_image = 0
-
-    def detect(self, image):
-        self.cnt_image += 1
-        if self.cnt_image == 1:
-            self.image_h = image.shape[0]
-            self.image_w = image.shape[1]
-            self.scale_y = 1.0 * self.image_h / self.image_w
-
-        # Inference
-        humans = self.e.inference(image, resize_to_default=(self.w > 0 and self.h > 0),
-                                #   upsample_size=self.args.resize_out_ratio)
-                                  upsample_size=self.resize_out_ratio)
-
-
-        return humans
-    
-    def draw(self, img_disp, humans):
-        img_disp = TfPoseEstimator.draw_humans(img_disp, humans, imgcopy=False)
-
-    def humans_to_skelsList(self, humans, scale_y = None): # get (x, y * scale_y)
-        # type: humans: returned from self.detect()
-        # rtype: list[list[]]
-        if scale_y is None:
-            scale_y = self.scale_y
-        skeletons = []
-        NaN = 0
-        for human in humans:
-            skeleton = [NaN]*(18*2)
-            for i, body_part in human.body_parts.items(): # iterate dict
-                idx = body_part.part_idx
-                skeleton[2*idx]=body_part.x
-                skeleton[2*idx+1]=body_part.y * scale_y
-            skeletons.append(skeleton)
-        return skeletons, scale_y
-
-# ==============================================================
-
 class basic_desk():
     def __init__(self,master):
-        self.master = master
-        
+        self.master = master    
+        self.basic_func()
+        self.bottom_func()
+
+    def bottom_func(self):    
+        # 底栏Frame
+        self.bottom_frame = Frame(self.master)
+        self.bottom_frame.pack(side=BOTTOM,anchor=SW)
+        # 进入下一界面
+        change = Button(self.bottom_frame,text='Continue',command=self.change_func)
+        change.grid(row=1,column=1)
+        # return to last Frame
+        back = Button(self.bottom_frame,text='Back',command=self.back_func)
+        back.grid(row=1,column=2)
+        # 退出
+        _quit = Button(self.bottom_frame,text='  Quit  ',command=self.master.quit)
+        _quit.grid(row=1,column=3)
+
+
+    def basic_func(self):   
         # 初始化进入界面
         self.basic = Frame(self.master,width=1000,height=1000)
         self.basic.pack()
         # 标题
         Label(self.basic,text='Action Recognition',font=("Arial",15)).pack()
-        
 
-        
         self.model_frame = Frame(self.basic)
         self.model_frame.pack()
         # Choose Neural Model
@@ -129,22 +73,18 @@ class basic_desk():
         skeleton_openpose = Radiobutton(self.skeleton_frame,text='OpenPose',variable=self.skeleton_type,value='OpenPose')
         skeleton_openpose.grid(row=5,column=6)
 
-        # 底栏Frame
-        self.bottom_frame = Frame(self.master)
-        self.bottom_frame.pack(side=BOTTOM,anchor=SW)
-        # 进入下一界面
-        change = Button(self.bottom_frame,text='Continue',command=self.change_func)
-        change.grid(row=1,column=1)
-        # 退出
-        _quit = Button(self.bottom_frame,text='  Quit  ',command=self.master.quit)
-        _quit.grid(row=1,column=2)
-
+        
     def change_func(self):
-        # 进入下一界面
-        self.basic.destroy()
-        self.detect()
+        if  self.basic._name in self.master.children:
+            self.basic.destroy()
+            self.detect()
         # self.bottom_frame.destroy()
         # detect_desk(self.master,device=self.device,flag=flag)
+
+    def back_func(self):
+        if self.detect_frame._name in self.master.children:
+            self.detect_frame.destroy()
+            self.basic_func()
 
     def detect(self):
         # 初始化进入界面
@@ -164,7 +104,7 @@ class basic_desk():
             self.model = cnn()
         # print(self.model_type)
         if self.skeleton_type.get() == 'OpenPose':
-            self.detector = SkeletonDetector("mobilenet_thin","640x480")
+            self.detector = SkeletonDetector("mobilenet_thin","432x368")
         # image panel
         self.panel = Label(self.detect_frame)
         self.panel.pack()
@@ -206,22 +146,23 @@ class basic_desk():
                             temp_joints = np.append(temp_joints,joints[i].Position.z)
             elif self.skeleton_type.get() == 'OpenPose':
                 if self._kinect.has_new_depth_frame():
+                    self.img = cv2.resize(self.img,(432,368))
                     humans = self.detector.detect(self.img)
                     skeletons,scale_y = self.detector.humans_to_skelsList(humans)
                     self.detector.draw(self.img,humans)
                     # pos = get_world_pos(self._kinect,skeletons)
                     # pos = np.array(pos[0])
                     # temp_joints = np.append(temp_joints,pos)
-                    temp_joints = to_kinect(self._kinect,skeletons)
-            # print(temp_joints.shape)
-            if temp_joints.shape[0] != 0:
-                # input data and output label
-                # print(temp_joints)
-                temp_label = self.model.data_input(temp_joints)
-                if temp_label != ' ':
-                    self.last_label = temp_label
-                # print(temp_label)
-                self.label.set(self.last_label)
+                    temp_joints = to_kinect(self._kinect,skeletons) # I do not know it is right
+            # # print(temp_joints.shape)
+            # if temp_joints.shape[0] != 0:
+            #     # input data and output label
+            #     # print(temp_joints)
+            #     temp_label = self.model.data_input(temp_joints)
+            #     if temp_label != ' ':
+            #         self.last_label = temp_label
+            #     # print(temp_label)
+            #     self.label.set(self.last_label)
             # output image
             self.img = cv2.resize(self.img,(640,480))
             current_img = Image.fromarray(self.img)
