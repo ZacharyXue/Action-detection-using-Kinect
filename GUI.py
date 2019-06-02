@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 
 from mylib.pk_func import to_kinect,draw_body
-from mylib.create_data import create_data
+from mylib.train import train
 
 class basic_desk():
     def __init__(self,master):
@@ -81,7 +81,7 @@ class basic_desk():
             self.detect()
         if self.train._name in self.master.children:
             model = self.training_model.get()
-            create_data(model=model)
+            train(model=model)
             if model == 'LSTM':
                 pass
             elif model == 'CNN':

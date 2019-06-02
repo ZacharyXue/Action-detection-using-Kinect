@@ -59,24 +59,28 @@ class dataCreate:
         '''
         output: skeleton,label
         '''
-        import os
+        import os,sys 
+        parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+        sys.path.insert(0,parentdir) 
         from mylib.preprocess import preprocessing 
 
         all_skeleton = np.array([])
         all_label = np.array([])
 
         for i in os.listdir(self.path+'/data2'):
+            if i == 'data.npz':
+                continue
             for j in os.listdir('{}/data2/{}'.format(self.path,i)):
                 try:
                     # ====pay attention to this address, every time move python file, remember to change it====#
-                    rawData = np.loadtxt('{}/data2/{}/{}.txt'.format(self.path,i,j))
+                    rawData = np.loadtxt('{}/data2/{}/{}'.format(self.path,i,j))
                 except:
                     pass
                 else:
                     _pre = preprocessing(pos=rawData)
                     _skeleton = _pre.run()
                     # print("_data size is {}".format(_data.shape))                        
-                    skeleton,label = self.add2List(_skeleton,i)
+                    skeleton,label = self.add2List(_skeleton,int(i))
                     all_skeleton = np.append(all_skeleton,skeleton)
                     all_label = np.append(all_label,label)
                     # print("allData size is {}".format(allData.shape))
@@ -91,7 +95,6 @@ class dataCreate:
         output: skeleton,label,test_skeleton,test_label
         '''
         skeleton,label = self.dataImport()
-        # print(data.shape)
         # allLabel = np.reshape(allLabel,[-1,len(self.selectedLabel)])
         size = skeleton.shape[0]
 
@@ -202,4 +205,4 @@ class dataCreate:
 
 # try to find out the class if it works or not
 if __name__ == "__main__":    
-    dataCreate(model='CNN').data()
+    dataCreate(model='CNN').run()

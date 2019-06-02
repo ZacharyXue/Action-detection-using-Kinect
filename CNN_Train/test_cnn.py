@@ -9,6 +9,7 @@ from mylib.plot_Matrix import plot_Matrix
 
 # data
 data = dataCreate(model='CNN')
+data.run()
 data.data()
 
 sess = tf.Session()
