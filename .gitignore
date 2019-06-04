@@ -2,3 +2,5 @@ __pycache__
 logs
 LSTM_Train/data/~$Actions_v2.xlsx
 *.npz
+LSTM_Train/Model4/*
+CNN_Train/Model4/*

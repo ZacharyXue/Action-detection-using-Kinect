@@ -45,7 +45,7 @@ class basic_desk():
         model_frame.pack()
         # Choose Neural Model
         # Create label
-        model_label = Label(model_frame,text='The neural model: ')
+        model_label = Label(model_frame,text='The neural model: ',anchor='w')
         model_label.grid(row=1,column=0,rowspan=2,columnspan=2)
         
         self.model_type = StringVar()
@@ -72,8 +72,11 @@ class basic_desk():
         train_frame = Frame(self.basic)
         train_frame.pack()
 
-        train = Button(train_frame,text='Training',command=self.train_func)
-        train.grid(row=1,column=1)
+        Label(train_frame,text='如果进行训练，请将数据集放入data文件夹，其中要有Skeleton.txt:空格隔开，label.txt:逗号隔开，回车键换行，格式为：标签，开始帧，结束帧;'
+            ,font=("Arial",10),width = 60,height = 3,wraplength = 400,justify = 'left').pack()
+
+        train = Button(train_frame,text='Start training',command=self.train_func)
+        train.pack(side=RIGHT)
       
     def change_func(self):
         if  self.basic._name in self.master.children:
@@ -81,11 +84,8 @@ class basic_desk():
             self.detect()
         if self.train._name in self.master.children:
             model = self.training_model.get()
-            train(model=model)
-            if model == 'LSTM':
-                pass
-            elif model == 'CNN':
-                pass
+            temp = train(model=model)
+            self.trained_rate.set(' The accuracy of the model is {}'.format(temp)) 
         # self.bottom_frame.destroy()
         # detect_desk(self.master,device=self.device,flag=flag)
 
@@ -128,6 +128,14 @@ class basic_desk():
         model_LSTM.grid(row=5,column=1)
         model_CNN = Radiobutton(select,text='CNN',variable=self.training_model,value='CNN')
         model_CNN.grid(row=5,column=6)
+        # ========================================================================================
+        result = Frame(self.train)
+        result.pack()
+        # display the correct rate
+        self.trained_rate = StringVar()
+        self.trained_rate.set(' The accuracy of the model is ')
+        trained_label = Label(result,textvariable=self.trained_rate,justify = 'left')
+        trained_label.grid(row=1,column=0,rowspan=2,columnspan=2)
 
 
     def detect(self):
