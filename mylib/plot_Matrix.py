@@ -46,8 +46,8 @@ def plot_Matrix(cm, classes, title=None,  cmap=plt.cm.Blues):
                         ha="center", va="center",
                         color="white"  if cm[i, j] > thresh else "black",fontsize=12)
     fig.tight_layout()
-    # plt.savefig('cm.jpg', dpi=300)
-    plt.show()
+    plt.savefig('cm.jpg', dpi=300)
+    # plt.show()
 
 # cm = np.array([[373,0,3,0],[0,128,3,32],[13,5,158,35],[19,14,15,208]])
 # plot_Matrix(cm=cm,classes=['fall','waving','kick','throw'])

@@ -79,13 +79,19 @@ class basic_desk():
         train.pack(side=RIGHT)
       
     def change_func(self):
-        if  self.basic._name in self.master.children:
-            self.basic.destroy()
-            self.detect()
-        if self.train._name in self.master.children:
-            model = self.training_model.get()
-            temp = train(model=model)
-            self.trained_rate.set(' The accuracy of the model is {}'.format(temp)) 
+        try:
+            if  self.basic._name in self.master.children:
+                self.basic.destroy()
+                self.detect()
+        except:
+            pass
+        try:
+            if self.train._name in self.master.children:
+                model = self.training_model.get()
+                temp = train(model=model)
+                self.trained_rate.set(' The accuracy of the model is {:.2f}'.format(temp))
+        except:
+            pass 
         # self.bottom_frame.destroy()
         # detect_desk(self.master,device=self.device,flag=flag)
 
@@ -113,7 +119,7 @@ class basic_desk():
         word = Frame(self.train)
         word.pack()
         Label(word,text='Action Recognition',font=("Arial",15)).pack()
-        Label(word,text='Training the model',font=("Arial",10)).pack()
+        Label(word,text='Training the model',font=("Arial",13)).pack()
         # ====================================================================================
         select = Frame(self.train)
         select.pack()
@@ -134,9 +140,32 @@ class basic_desk():
         # display the correct rate
         self.trained_rate = StringVar()
         self.trained_rate.set(' The accuracy of the model is ')
-        trained_label = Label(result,textvariable=self.trained_rate,justify = 'left')
+        trained_label = Label(result,textvariable=self.trained_rate,justify = 'left',font=("Arial",12))
         trained_label.grid(row=1,column=0,rowspan=2,columnspan=2)
+        change_model = Button(result,text='Change the model',command=self.open_file)
+        change_model.grid(row=6,column=1)
+        show_matrix = Button(result,text='Show the confusion matrix',command=self.show_confusion)
+        show_matrix.grid(row=6,column=2)
 
+    def show_confusion(self):
+        import os
+        try:
+            os.startfile('data\cm.jpg')
+        except:
+            os.startfile('data/cm.jpg')
+
+    def open_file(self):
+        import os
+        path = ['']
+        if self.training_model.get() == 'LSTM':
+            path = ['LSTM_Train\lstm.py','LSTM_Train/lstm.py']
+        elif self.training_model.get() == 'CNN':
+            path = ['CNN_Train\keleton_based_classfication.py','CNN_Train/keleton_based_classfication.py']
+
+        try:
+            os.startfile(path[0])
+        except:
+            os.startfile(path[1])
 
     def detect(self):
         # 初始化进入界面
