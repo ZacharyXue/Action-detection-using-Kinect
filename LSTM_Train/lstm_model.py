@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from LSTM_Train.preprocess import preprocessing as pre
+from mylib.preprocess import preprocessing as pre
 
 class lstm():
     def __init__(self):

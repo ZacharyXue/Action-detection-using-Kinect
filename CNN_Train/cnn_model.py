@@ -17,7 +17,7 @@ class cnn():
         # initialize output
         self.output = graph.get_tensor_by_name("accuracy/ArgMax:0")
 
-        self.label_dict = {0:'falling',1:'waving',2:'kicking',3:'throw'}
+        self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
 
         self.Data = np.array([])
 
