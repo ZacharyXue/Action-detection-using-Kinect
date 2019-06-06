@@ -16,7 +16,7 @@ class lstm():
         # initialize output
         self.output = graph.get_tensor_by_name("output_layer/Softmax:0")
 
-        self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
+        # self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
 
     def data_input(self,data):      
         data_pre = pre(pos=data).run()
@@ -24,4 +24,4 @@ class lstm():
             self.keep_prob:1})
         label = int(np.argmax(y_pred,1))
         # print(label)
-        return self.label_dict[label]
+        return label
