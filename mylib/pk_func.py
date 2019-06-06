@@ -19,10 +19,13 @@ def draw_body_bone(joints, jointPoints, joint0, joint1,img):
     # both joints are not *really* tracked
     if (joint0State == PyKinectV2.TrackingState_Inferred) and (joint1State == PyKinectV2.TrackingState_Inferred):
         return
-
-    start = (int(jointPoints[joint0].x), int(jointPoints[joint0].y))
-    end = (int(jointPoints[joint1].x), int(jointPoints[joint1].y))
-    cv2.line(img, start,end,(0, 0, 255),8)
+    try:
+        start = (int(jointPoints[joint0].x), int(jointPoints[joint0].y))
+        end = (int(jointPoints[joint1].x), int(jointPoints[joint1].y))
+    except:
+        pass
+    else:
+        cv2.line(img, start,end,(0, 0, 255),8)
 
 def draw_body(joints, jointPoints,img):
     # Torso
