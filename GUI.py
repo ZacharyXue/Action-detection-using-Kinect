@@ -154,6 +154,9 @@ class basic_desk():
         show_matrix.grid(row=6,column=2)
 
     def show_confusion(self):
+        '''
+        功能实现应该简单吧？
+        '''
         import os
         try:
             os.startfile('data\cm.jpg')
