@@ -88,8 +88,9 @@ class basic_desk():
         try:
             if self.train._name in self.master.children:
                 model = self.training_model.get()
-                temp = train(model=model)
-                self.trained_rate.set(' The accuracy of the model is {:.2f}'.format(temp))
+                print('The model is {}, the label is {}'.format(model,self.label_text))
+                # temp = train(model=model)
+                # self.trained_rate.set(' The accuracy of the model is {:.2f}'.format(temp))
         except:
             pass 
         # self.bottom_frame.destroy()
@@ -134,6 +135,11 @@ class basic_desk():
         model_LSTM.grid(row=5,column=1)
         model_CNN = Radiobutton(select,text='CNN',variable=self.training_model,value='CNN')
         model_CNN.grid(row=5,column=6)
+        
+        self.label_text = StringVar()
+        entry_label = Entry(select,textvariable=self.label_text)
+        self.label_text.set('falling,waving,kicking,punching,standing,walking,jumping')
+        entry_label.grid(row=6,column=1)
         # ========================================================================================
         result = Frame(self.train)
         result.pack()
@@ -148,6 +154,9 @@ class basic_desk():
         show_matrix.grid(row=6,column=2)
 
     def show_confusion(self):
+        '''
+        功能实现应该简单吧？
+        '''
         import os
         try:
             os.startfile('data\cm.jpg')

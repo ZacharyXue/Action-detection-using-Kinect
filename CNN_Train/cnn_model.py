@@ -17,7 +17,7 @@ class cnn():
         # initialize output
         self.output = graph.get_tensor_by_name("accuracy/ArgMax:0")
 
-        self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
+        # self.label_dict = {1:'falling',5:'waving',2:'kicking',4:'punching',0:'standing',3:'walking',6:'jumping'}
 
         self.Data = np.array([])
 
@@ -35,7 +35,5 @@ class cnn():
             y_pred = self.sess.run(self.output,feed_dict={self.x_skeleton:skeleton,\
                 self.x_motion:motion,self.keep_prob:1})
 
-            label = self.label_dict[int(y_pred)]
-
-        return label
+        return y_pred
         
