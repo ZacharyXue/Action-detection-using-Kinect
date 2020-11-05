@@ -8,4 +8,4 @@
 
 当然最终效果可能对于大部分人来说不算理想，但是对于一个刚刚入门的学生来说，至少自己觉得，不错了
 
-[一年后回顾](https://github.com/ZacharyXue/Action-detection-using-Kinect/blob/master/%E4%B8%80%E5%B9%B4%E5%90%8E%E5%9B%9E%E7%9C%8B%E6%AF%95%E8%AE%BE.md)
+[一年后回顾](https://coding-pages-bucket-3478862-7966075-2131-336106-1303849562.cos-website.ap-shanghai.myqcloud.com/post/yi-nian-hou-hui-kan-bi-she/)
